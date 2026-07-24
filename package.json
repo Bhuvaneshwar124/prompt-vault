@@ -1,0 +1,10 @@
+{
+  "name": "prompt-vault-root",
+  "version": "1.0.0",
+  "description": "Prompt Vault - Enterprise AI Prompt Management Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "cd backend && .\\mvnw.cmd spring-boot:run"
+  }
+}
