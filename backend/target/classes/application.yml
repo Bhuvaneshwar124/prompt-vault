@@ -6,8 +6,8 @@ spring:
     name: prompt-vault-backend
 
   datasource:
-    url: jdbc:postgresql://db.mvgfdthlkmdrnlnbhhmr.supabase.co:5432/postgres
-    username: postgres
+    url: jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres
+    username: postgres.mvgfdthlkmdrnlnbhhmr
     password: QtfFZiy4HhChwWzH
     driver-class-name: org.postgresql.Driver
 
