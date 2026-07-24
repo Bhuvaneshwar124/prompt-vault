@@ -68,6 +68,11 @@ public class WebSecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/v1/prompts").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
+                .antMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**"
+                ).permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated();
 
