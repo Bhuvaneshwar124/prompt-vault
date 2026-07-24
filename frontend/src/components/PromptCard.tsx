@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Prompt } from '../types/prompt';
 import { VariableFillerModal } from './VariableFillerModal';
-import { Star, Eye, Copy, Sliders, Cpu, Trash2 } from 'lucide-react';
+import { PromptDetailsModal } from './PromptDetailsModal';
+import { Star, Eye, Sliders, Cpu, Trash2, Heart, MessageSquare } from 'lucide-react';
 import api from '../api/axios';
 
 interface PromptCardProps {
@@ -18,7 +19,9 @@ export const PromptCard: React.FC<PromptCardProps> = ({
   currentUsername,
 }) => {
   const [showFiller, setShowFiller] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [isFavorite, setIsFavorite] = useState(prompt.isFavorite);
+  const [likeCount, setLikeCount] = useState(prompt.likeCount);
 
   const handleFavorite = async () => {
     try {
@@ -26,6 +29,18 @@ export const PromptCard: React.FC<PromptCardProps> = ({
       if (res.data.success) {
         setIsFavorite(!isFavorite);
         if (onFavoriteToggle) onFavoriteToggle(prompt.id);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const res = await api.post(`/prompts/${prompt.id}/like`);
+      if (res.data.success) {
+        setLikeCount(res.data.data);
       }
     } catch (err) {
       console.error(err);
@@ -58,7 +73,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
             <div className="flex items-center space-x-1">
               <button
                 onClick={handleFavorite}
-                className={`p-1.5 rounded-xl border transition-all ${
+                className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
                   isFavorite
                     ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
                     : 'bg-slate-900/60 border-slate-800 text-slate-500 hover:text-amber-400'
@@ -70,7 +85,7 @@ export const PromptCard: React.FC<PromptCardProps> = ({
               {isAuthor && onDelete && (
                 <button
                   onClick={() => onDelete(prompt.id)}
-                  className="p-1.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all"
+                  className="p-1.5 rounded-xl bg-slate-900/60 border border-slate-800 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -78,7 +93,10 @@ export const PromptCard: React.FC<PromptCardProps> = ({
             </div>
           </div>
 
-          <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
+          <h3
+            onClick={() => setShowDetails(true)}
+            className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1 cursor-pointer"
+          >
             {prompt.title}
           </h3>
 
@@ -90,7 +108,10 @@ export const PromptCard: React.FC<PromptCardProps> = ({
         </div>
 
         {/* Code Snippet Box */}
-        <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-900 font-mono text-[11px] text-slate-300 line-clamp-3 relative">
+        <div
+          onClick={() => setShowDetails(true)}
+          className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-900 font-mono text-[11px] text-slate-300 line-clamp-3 relative cursor-pointer hover:border-slate-800 transition-colors"
+        >
           {prompt.promptText}
         </div>
 
@@ -121,11 +142,21 @@ export const PromptCard: React.FC<PromptCardProps> = ({
         {/* Footer Actions */}
         <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
           <div className="flex items-center space-x-3 text-slate-500 text-[11px]">
-            <span className="flex items-center space-x-1">
-              <Eye className="w-3.5 h-3.5" />
-              <span>{prompt.viewCount} views</span>
-            </span>
-            <span>• {prompt.author?.username}</span>
+            <button
+              onClick={handleLike}
+              className="flex items-center space-x-1 hover:text-rose-400 transition-colors cursor-pointer"
+            >
+              <Heart className="w-3.5 h-3.5 fill-rose-500/20 text-rose-400" />
+              <span>{likeCount}</span>
+            </button>
+
+            <button
+              onClick={() => setShowDetails(true)}
+              className="flex items-center space-x-1 hover:text-indigo-400 transition-colors cursor-pointer"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Details</span>
+            </button>
           </div>
 
           <button
@@ -140,6 +171,14 @@ export const PromptCard: React.FC<PromptCardProps> = ({
 
       {showFiller && (
         <VariableFillerModal prompt={prompt} onClose={() => setShowFiller(false)} />
+      )}
+
+      {showDetails && (
+        <PromptDetailsModal
+          prompt={prompt}
+          onClose={() => setShowDetails(false)}
+          currentUsername={currentUsername}
+        />
       )}
     </>
   );
