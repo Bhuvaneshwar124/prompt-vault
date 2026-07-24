@@ -29,6 +29,12 @@ public class PromptRequest {
     @NotBlank(message = "Target model is required")
     private String targetModel;
 
+    // AI Tool & Chat Location Tracking
+    private String aiTool;
+    private String externalChatUrl;
+    private String externalChatId;
+    private String chatSummary;
+
     @NotNull(message = "Category ID is required")
     private Long categoryId;
 

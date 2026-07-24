@@ -5,7 +5,8 @@ import { Navbar } from './components/Navbar';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { CategoriesPage } from './pages/CategoriesPage';
+import { ExplorePage } from './pages/ExplorePage';
+import { LandingPage } from './pages/LandingPage';
 
 const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -25,17 +26,13 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
 };
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100">
       <Navbar />
       <main className="flex-grow">
         <Routes>
-          <Route
-            path="/"
-            element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}
-          />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/explore" element={<ExplorePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route
@@ -43,14 +40,6 @@ const AppContent: React.FC = () => {
             element={
               <ProtectedRoute>
                 <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/categories"
-            element={
-              <ProtectedRoute>
-                <CategoriesPage />
               </ProtectedRoute>
             }
           />

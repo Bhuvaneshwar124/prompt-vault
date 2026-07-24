@@ -68,6 +68,10 @@ public class PromptServiceImpl implements PromptService {
                 .promptText(promptRequest.getPromptText())
                 .systemInstruction(promptRequest.getSystemInstruction())
                 .targetModel(promptRequest.getTargetModel() != null ? promptRequest.getTargetModel() : "GPT-4")
+                .aiTool(promptRequest.getAiTool() != null ? promptRequest.getAiTool() : "ChatGPT")
+                .externalChatUrl(promptRequest.getExternalChatUrl())
+                .externalChatId(promptRequest.getExternalChatId())
+                .chatSummary(promptRequest.getChatSummary())
                 .isPublic(promptRequest.getIsPublic() != null ? promptRequest.getIsPublic() : true)
                 .user(user)
                 .category(category)
@@ -80,18 +84,11 @@ public class PromptServiceImpl implements PromptService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<PromptResponse> searchPrompts(String search, String categorySlug, String tagSlug, int page, int size, String sortBy, String sortDir, String currentUsername) {
+    public PagedResponse<PromptResponse> searchPrompts(String search, String categorySlug, String tagSlug, String aiTool, int page, int size, String sortBy, String sortDir, String currentUsername) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Long currentUserId = null;
-        if (currentUsername != null) {
-            userRepository.findByUsername(currentUsername).ifPresent(u -> {
-                // Ignore for spec filtering if admin or public
-            });
-        }
-
-        Specification<Prompt> spec = PromptSpecification.filterPrompts(search, categorySlug, tagSlug, true, currentUserId);
+        Specification<Prompt> spec = PromptSpecification.filterPrompts(search, categorySlug, tagSlug, aiTool, true, null);
         Page<Prompt> promptsPage = promptRepository.findAll(spec, pageable);
 
         List<PromptResponse> content = promptsPage.getContent().stream()
@@ -114,7 +111,6 @@ public class PromptServiceImpl implements PromptService {
         Prompt prompt = promptRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Prompt", "id", id));
 
-        // Increment view count
         prompt.setViewCount(prompt.getViewCount() + 1);
         Prompt saved = promptRepository.save(prompt);
         return promptMapper.toPromptResponse(saved);
@@ -143,6 +139,10 @@ public class PromptServiceImpl implements PromptService {
         prompt.setPromptText(promptRequest.getPromptText());
         prompt.setSystemInstruction(promptRequest.getSystemInstruction());
         prompt.setTargetModel(promptRequest.getTargetModel());
+        if (promptRequest.getAiTool() != null) prompt.setAiTool(promptRequest.getAiTool());
+        prompt.setExternalChatUrl(promptRequest.getExternalChatUrl());
+        prompt.setExternalChatId(promptRequest.getExternalChatId());
+        prompt.setChatSummary(promptRequest.getChatSummary());
         prompt.setIsPublic(promptRequest.getIsPublic());
         prompt.setCategory(category);
         prompt.setTags(tags);

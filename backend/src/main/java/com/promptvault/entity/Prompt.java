@@ -42,6 +42,20 @@ public class Prompt {
     @Builder.Default
     private String targetModel = "GPT-4";
 
+    // AI Tool Integration & External Chat Location Indexing
+    @Column(name = "ai_tool", length = 50)
+    @Builder.Default
+    private String aiTool = "ChatGPT";
+
+    @Column(name = "external_chat_url", length = 500)
+    private String externalChatUrl;
+
+    @Column(name = "external_chat_id", length = 100)
+    private String externalChatId;
+
+    @Column(name = "chat_summary", length = 500)
+    private String chatSummary;
+
     @Column(name = "is_public", nullable = false)
     @Builder.Default
     private Boolean isPublic = true;

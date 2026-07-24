@@ -33,6 +33,7 @@ public class PromptController {
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "category", required = false) String categorySlug,
             @RequestParam(value = "tag", required = false) String tagSlug,
+            @RequestParam(value = "aiTool", required = false) String aiTool,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
@@ -41,7 +42,7 @@ public class PromptController {
         
         String username = authentication != null ? authentication.getName() : null;
         PagedResponse<PromptResponse> response = promptService.searchPrompts(
-                search, categorySlug, tagSlug, page, size, sortBy, sortDir, username);
+                search, categorySlug, tagSlug, aiTool, page, size, sortBy, sortDir, username);
         
         return ResponseEntity.ok(ApiResponse.success("Prompts retrieved successfully!", response));
     }

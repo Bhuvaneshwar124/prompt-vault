@@ -21,16 +21,22 @@ public class PromptResponse {
     private String promptText;
     private String systemInstruction;
     private String targetModel;
+
+    // AI Tool & Chat Location Details
+    private String aiTool;
+    private String externalChatUrl;
+    private String externalChatId;
+    private String chatSummary;
+
     private Boolean isPublic;
     private Boolean isFavorite;
     private Integer viewCount;
     private Integer likeCount;
-    
+
     private CategoryResponse category;
     private Set<TagResponse> tags;
     private UserResponse author;
-    
-    // Extracted dynamic template variables (e.g. ['language', 'framework'])
+
     private List<String> extractedVariables;
 
     private LocalDateTime createdAt;

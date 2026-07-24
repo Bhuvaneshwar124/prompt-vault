@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Terminal, LogOut, Shield, FolderGit2, LayoutDashboard } from 'lucide-react';
+import { Terminal, LogOut, Shield, LayoutDashboard, Compass } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
@@ -25,8 +25,20 @@ export const Navbar: React.FC = () => {
             </div>
           </Link>
 
-          {isAuthenticated && (
-            <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2">
+            <Link
+              to="/explore"
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                location.pathname === '/explore'
+                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+              }`}
+            >
+              <Compass className="w-4 h-4 text-purple-400" />
+              <span>Explore Hub</span>
+            </Link>
+
+            {isAuthenticated && (
               <Link
                 to="/dashboard"
                 className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
@@ -35,22 +47,11 @@ export const Navbar: React.FC = () => {
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
                 }`}
               >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Dashboard</span>
+                <LayoutDashboard className="w-4 h-4 text-indigo-400" />
+                <span>My Indexer</span>
               </Link>
-              <Link
-                to="/categories"
-                className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                  location.pathname === '/categories'
-                    ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-                }`}
-              >
-                <FolderGit2 className="w-4 h-4" />
-                <span>Categories & Tags</span>
-              </Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {isAuthenticated ? (
@@ -98,3 +99,5 @@ export const Navbar: React.FC = () => {
     </nav>
   );
 };
+
+export default Navbar;

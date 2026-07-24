@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import api from '../api/axios';
-import { Category, Tag } from '../types/categoryTag';
 import { PromptRequest, Prompt } from '../types/prompt';
 import { ApiResponse } from '../types/auth';
-import { X, Plus, Sparkles, AlertCircle, FileText, Cpu, Folder } from 'lucide-react';
+import { X, Plus, Sparkles, AlertCircle, FileText, Cpu, Bot, Link2 } from 'lucide-react';
 
 interface CreatePromptModalProps {
   onClose: () => void;
@@ -11,8 +10,6 @@ interface CreatePromptModalProps {
 }
 
 export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, onSuccess }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,46 +18,21 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
     description: '',
     promptText: '',
     systemInstruction: '',
-    targetModel: 'GPT-4',
-    categoryId: 0,
+    targetModel: 'GPT-4o',
+    aiTool: 'ChatGPT',
+    externalChatUrl: '',
+    chatSummary: '',
+    categoryId: 1,
     tagIds: [],
     isPublic: true,
   });
-
-  useEffect(() => {
-    const fetchTaxonomy = async () => {
-      try {
-        const [catRes, tagRes] = await Promise.all([
-          api.get<ApiResponse<Category[]>>('/categories'),
-          api.get<ApiResponse<Tag[]>>('/tags'),
-        ]);
-        if (catRes.data.success && catRes.data.data.length > 0) {
-          setCategories(catRes.data.data);
-          setFormData((prev) => ({ ...prev, categoryId: catRes.data.data[0].id }));
-        }
-        if (tagRes.data.success) setTags(tagRes.data.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchTaxonomy();
-  }, []);
-
-  const handleTagToggle = (tagId: number) => {
-    const currentTags = formData.tagIds || [];
-    if (currentTags.includes(tagId)) {
-      setFormData({ ...formData, tagIds: currentTags.filter((id) => id !== tagId) });
-    } else {
-      setFormData({ ...formData, tagIds: [...currentTags, tagId] });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!formData.title.trim() || !formData.promptText.trim() || !formData.categoryId) {
-      setError('Please fill in all required fields (Title, Prompt Text, Category)');
+    if (!formData.title.trim() || !formData.promptText.trim()) {
+      setError('Please fill in all required fields (Prompt Title and Prompt Text)');
       return;
     }
 
@@ -88,8 +60,8 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Create New AI Prompt</h2>
-              <p className="text-xs text-slate-400">Save, tag, and organize prompts with dynamic variable support</p>
+              <h2 className="text-xl font-bold text-white">Index AI Prompt & Chat Location</h2>
+              <p className="text-xs text-slate-400">Track chats across ChatGPT, Gemini, Groq, Claude, and DeepSeek</p>
             </div>
           </div>
 
@@ -106,37 +78,68 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Title & Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Prompt Title *</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. Senior Java Code Reviewer"
-                className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 placeholder-slate-600 outline-none"
-                required
-              />
+          {/* Title */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Prompt Title *</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="e.g. Senior Java Spring Boot Code Reviewer"
+              className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 placeholder-slate-600 outline-none"
+              required
+            />
+          </div>
+
+          {/* AI Tool Integration Fields */}
+          <div className="p-4 rounded-2xl bg-indigo-950/20 border border-indigo-800/40 space-y-4">
+            <h4 className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center space-x-1.5">
+              <Bot className="w-4 h-4 text-indigo-400" />
+              <span>AI Provider & Chat Location Indexing</span>
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">AI Provider / Platform</label>
+                <select
+                  value={formData.aiTool}
+                  onChange={(e) => setFormData({ ...formData, aiTool: e.target.value })}
+                  className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 outline-none"
+                >
+                  <option value="ChatGPT">ChatGPT (OpenAI)</option>
+                  <option value="Gemini">Google Gemini</option>
+                  <option value="Groq">Groq LPU</option>
+                  <option value="Claude">Claude (Anthropic)</option>
+                  <option value="DeepSeek">DeepSeek R1</option>
+                  <option value="Midjourney">Midjourney</option>
+                  <option value="Other">Other AI Tool</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1">
+                  <Link2 className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>External Chat Session URL</span>
+                </label>
+                <input
+                  type="url"
+                  value={formData.externalChatUrl}
+                  onChange={(e) => setFormData({ ...formData, externalChatUrl: e.target.value })}
+                  placeholder="https://chatgpt.com/c/67890..."
+                  className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 placeholder-slate-600 outline-none"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1">
-                <Folder className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Category *</span>
-              </label>
-              <select
-                value={formData.categoryId}
-                onChange={(e) => setFormData({ ...formData, categoryId: Number(e.target.value) })}
-                className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 outline-none"
-                required
-              >
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Conversation Summary / Result</label>
+              <input
+                type="text"
+                value={formData.chatSummary}
+                onChange={(e) => setFormData({ ...formData, chatSummary: e.target.value })}
+                placeholder="e.g. Refactored security filter chain code in ChatGPT"
+                className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 placeholder-slate-600 outline-none"
+              />
             </div>
           </div>
 
@@ -145,18 +148,21 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center space-x-1">
                 <Cpu className="w-3.5 h-3.5 text-purple-400" />
-                <span>Target Model</span>
+                <span>Target Model / Stack</span>
               </label>
               <select
                 value={formData.targetModel}
                 onChange={(e) => setFormData({ ...formData, targetModel: e.target.value })}
                 className="w-full bg-slate-900 border border-slate-800 focus:border-indigo-500 rounded-xl py-2.5 px-3.5 text-sm text-slate-100 outline-none"
               >
-                <option value="GPT-4">GPT-4 / GPT-4o</option>
+                <option value="GPT-4o">GPT-4o</option>
+                <option value="Gemini 1.5 Pro">Gemini 1.5 Pro</option>
+                <option value="LLaMA 3 70B (Groq)">LLaMA 3 70B (Groq)</option>
                 <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet</option>
-                <option value="Midjourney v6">Midjourney v6</option>
-                <option value="Llama 3">Llama 3</option>
-                <option value="DALL-E 3">DALL-E 3</option>
+                <option value="DeepSeek R1">DeepSeek R1</option>
+                <option value="Java / Spring Boot">Java / Spring Boot</option>
+                <option value="React / Next.js">React / Next.js</option>
+                <option value="Python / Machine Learning">Python / Machine Learning</option>
               </select>
             </div>
 
@@ -184,7 +190,7 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
               </span>
             </div>
             <textarea
-              rows={5}
+              rows={4}
               value={formData.promptText}
               onChange={(e) => setFormData({ ...formData, promptText: e.target.value })}
               placeholder="Act as a {{role}}. Review the following {{language}} snippet..."
@@ -192,32 +198,6 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
               required
             />
           </div>
-
-          {/* Tags Selection */}
-          {tags.length > 0 && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">Select Tags</label>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => {
-                  const selected = formData.tagIds?.includes(tag.id);
-                  return (
-                    <button
-                      type="button"
-                      key={tag.id}
-                      onClick={() => handleTagToggle(tag.id)}
-                      className={`text-xs px-3 py-1 rounded-full border transition-all cursor-pointer ${
-                        selected
-                          ? 'bg-purple-600 text-white border-purple-500'
-                          : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
-                      }`}
-                    >
-                      #{tag.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* Submit Button */}
           <div className="pt-4 border-t border-slate-800 flex justify-end space-x-3">
@@ -234,7 +214,7 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
               className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2.5 px-6 rounded-xl shadow-lg shadow-indigo-600/25 flex items-center space-x-2 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>{loading ? 'Creating...' : 'Create Prompt'}</span>
+              <span>{loading ? 'Indexing Prompt...' : 'Save & Index Prompt'}</span>
             </button>
           </div>
         </form>
@@ -242,3 +222,5 @@ export const CreatePromptModal: React.FC<CreatePromptModalProps> = ({ onClose, o
     </div>
   );
 };
+
+export default CreatePromptModal;

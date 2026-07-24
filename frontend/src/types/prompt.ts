@@ -8,6 +8,13 @@ export interface Prompt {
   promptText: string;
   systemInstruction?: string;
   targetModel: string;
+  
+  // AI Tool & External Chat Location Properties
+  aiTool: string;
+  externalChatUrl?: string;
+  externalChatId?: string;
+  chatSummary?: string;
+
   isPublic: boolean;
   isFavorite: boolean;
   viewCount: number;
@@ -26,6 +33,12 @@ export interface PromptRequest {
   promptText: string;
   systemInstruction?: string;
   targetModel: string;
+  
+  aiTool?: string;
+  externalChatUrl?: string;
+  externalChatId?: string;
+  chatSummary?: string;
+
   categoryId: number;
   tagIds?: number[];
   isPublic?: boolean;

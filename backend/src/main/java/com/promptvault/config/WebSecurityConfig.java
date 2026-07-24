@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.http.HttpMethod;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,6 +64,10 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/prompts/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/prompts").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated();
 
