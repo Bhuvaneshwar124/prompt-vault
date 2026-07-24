@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -27,7 +28,7 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
 
 const AppContent: React.FC = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100">
+    <div className="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100 selection:bg-indigo-500 selection:text-white">
       <Navbar />
       <main className="flex-grow">
         <Routes>
@@ -45,6 +46,7 @@ const AppContent: React.FC = () => {
           />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 };
